@@ -1,0 +1,313 @@
+Unbind driver to find full HID descriptors
+Use lsusb -t to find bus ID
+
+echo -n "1-4:1.0" | sudo tee /sys/bus/usb/drivers/usbhid/unbind
+echo -n "1-4:1.1" | sudo tee /sys/bus/usb/drivers/usbhid/unbind
+
+
+Bus 001 Device 019: ID 258a:0033 SINOWEALTH Wired Gaming Mouse
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               1.10
+  bDeviceClass            0 
+  bDeviceSubClass         0 
+  bDeviceProtocol         0 
+  bMaxPacketSize0         8
+  idVendor           0x258a 
+  idProduct          0x0033 
+  bcdDevice            1.08
+  iManufacturer           1 SINOWEALTH
+  iProduct                2 Wired Gaming Mouse
+  iSerial                 0 
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength       0x003b
+    bNumInterfaces          2
+    bConfigurationValue     1
+    iConfiguration          0 
+    bmAttributes         0xa0
+      (Bus Powered)
+      Remote Wakeup
+    MaxPower              480mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      1 Boot Interface Subclass
+      bInterfaceProtocol      2 Mouse
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 Report
+          wDescriptorLength      71
+          Report Descriptor: (length is 71)
+            Item(Global): Usage Page, data= [ 0x01 ] 1
+                            Generic Desktop Controls
+            Item(Local ): Usage, data= [ 0x02 ] 2
+                            Mouse
+            Item(Main  ): Collection, data= [ 0x01 ] 1
+                            Application
+            Item(Local ): Usage, data= [ 0x01 ] 1
+                            Pointer
+            Item(Main  ): Collection, data= [ 0x00 ] 0
+                            Physical
+            Item(Global): Usage Page, data= [ 0x09 ] 9
+                            Buttons
+            Item(Local ): Usage Minimum, data= [ 0x01 ] 1
+                            Button 1 (Primary)
+            Item(Local ): Usage Maximum, data= [ 0x05 ] 5
+                            Button 5
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Logical Maximum, data= [ 0x01 ] 1
+            Item(Global): Report Size, data= [ 0x01 ] 1
+            Item(Global): Report Count, data= [ 0x05 ] 5
+            Item(Main  ): Input, data= [ 0x02 ] 2
+                            Data Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Global): Report Count, data= [ 0x03 ] 3
+            Item(Main  ): Input, data= [ 0x01 ] 1
+                            Constant Array Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Global): Usage Page, data= [ 0x01 ] 1
+                            Generic Desktop Controls
+            Item(Local ): Usage, data= [ 0x30 ] 48
+                            Direction-X
+            Item(Local ): Usage, data= [ 0x31 ] 49
+                            Direction-Y
+            Item(Global): Logical Minimum, data= [ 0x00 0x80 ] 32768
+            Item(Global): Logical Maximum, data= [ 0xff 0x7f ] 32767
+            Item(Global): Report Size, data= [ 0x10 ] 16
+            Item(Global): Report Count, data= [ 0x02 ] 2
+            Item(Main  ): Input, data= [ 0x06 ] 6
+                            Data Variable Relative No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Local ): Usage, data= [ 0x38 ] 56
+                            Wheel
+            Item(Global): Logical Minimum, data= [ 0x80 ] 128
+            Item(Global): Logical Maximum, data= [ 0x7f ] 127
+            Item(Global): Report Size, data= [ 0x08 ] 8
+            Item(Global): Report Count, data= [ 0x01 ] 1
+            Item(Main  ): Input, data= [ 0x06 ] 6
+                            Data Variable Relative No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Global): Usage Page, data= [ 0x0c ] 12
+                            Consumer
+            Item(Local ): Usage, data= [ 0x38 0x02 ] 568
+                            AC Pan
+            Item(Global): Report Count, data= [ 0x01 ] 1
+            Item(Main  ): Input, data= [ 0x06 ] 6
+                            Data Variable Relative No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Main  ): End Collection, data=none
+            Item(Main  ): End Collection, data=none
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0008  1x 8 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         3 Human Interface Device
+      bInterfaceSubClass      1 Boot Interface Subclass
+      bInterfaceProtocol      1 Keyboard
+      iInterface              0 
+        HID Device Descriptor:
+          bLength                 9
+          bDescriptorType        33
+          bcdHID               1.11
+          bCountryCode            0 Not supported
+          bNumDescriptors         1
+          bDescriptorType        34 Report
+          wDescriptorLength     213
+          Report Descriptor: (length is 213)
+            Item(Global): Usage Page, data= [ 0x01 ] 1
+                            Generic Desktop Controls
+            Item(Local ): Usage, data= [ 0x06 ] 6
+                            Keyboard
+            Item(Main  ): Collection, data= [ 0x01 ] 1
+                            Application
+            Item(Global): Report ID, data= [ 0x01 ] 1
+            Item(Global): Usage Page, data= [ 0x07 ] 7
+                            Keyboard
+            Item(Local ): Usage Minimum, data= [ 0xe0 ] 224
+                            Control Left
+            Item(Local ): Usage Maximum, data= [ 0xe7 ] 231
+                            GUI Right
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Logical Maximum, data= [ 0x01 ] 1
+            Item(Global): Report Size, data= [ 0x01 ] 1
+            Item(Global): Report Count, data= [ 0x08 ] 8
+            Item(Main  ): Input, data= [ 0x02 ] 2
+                            Data Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Global): Report Count, data= [ 0x06 ] 6
+            Item(Global): Report Size, data= [ 0x08 ] 8
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Logical Maximum, data= [ 0xff 0x00 ] 255
+            Item(Global): Usage Page, data= [ 0x07 ] 7
+                            Keyboard
+            Item(Local ): Usage Minimum, data= [ 0x00 ] 0
+                            No Event
+            Item(Local ): Usage Maximum, data= [ 0xff 0x00 ] 255
+                            (null)
+            Item(Main  ): Input, data= [ 0x00 ] 0
+                            Data Array Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Main  ): End Collection, data=none
+            Item(Global): Usage Page, data= [ 0x0c 0x00 ] 12
+                            Consumer
+            Item(Local ): Usage, data= [ 0x01 ] 1
+                            Consumer Control
+            Item(Main  ): Collection, data= [ 0x01 ] 1
+                            Application
+            Item(Global): Report ID, data= [ 0x02 ] 2
+            Item(Global): Logical Maximum, data= [ 0x01 ] 1
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Report Size, data= [ 0x01 ] 1
+            Item(Local ): Usage, data= [ 0xb5 0x00 ] 181
+                            Scan Next Track
+            Item(Local ): Usage, data= [ 0xb6 0x00 ] 182
+                            Scan Previous Track
+            Item(Local ): Usage, data= [ 0xb7 0x00 ] 183
+                            Stop
+            Item(Local ): Usage, data= [ 0xcd 0x00 ] 205
+                            Play/Pause
+            Item(Local ): Usage, data= [ 0xe2 0x00 ] 226
+                            Mute
+            Item(Local ): Usage, data= [ 0xa2 0x00 ] 162
+                            Daily
+            Item(Local ): Usage, data= [ 0xe9 0x00 ] 233
+                            Volume Increment
+            Item(Local ): Usage, data= [ 0xea 0x00 ] 234
+                            Volume Decrement
+            Item(Global): Report Count, data= [ 0x08 ] 8
+            Item(Main  ): Input, data= [ 0x03 ] 3
+                            Constant Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Local ): Usage, data= [ 0x83 0x01 ] 387
+                            AL Consumer Control Configuration
+            Item(Local ): Usage, data= [ 0x94 0x01 ] 404
+                            AL Local Machine Browser
+            Item(Local ): Usage, data= [ 0x86 0x01 ] 390
+                            AL Spreadsheet
+            Item(Local ): Usage, data= [ 0x88 0x01 ] 392
+                            AL Presentation App
+            Item(Local ): Usage, data= [ 0x8a 0x01 ] 394
+                            AL Email Reader
+            Item(Local ): Usage, data= [ 0x92 0x01 ] 402
+                            AL Calculator
+            Item(Local ): Usage, data= [ 0xa8 0x02 ] 680
+                            (null)
+            Item(Local ): Usage, data= [ 0x84 0x01 ] 388
+                            AL Word Processor
+            Item(Global): Report Count, data= [ 0x08 ] 8
+            Item(Main  ): Input, data= [ 0x03 ] 3
+                            Constant Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Local ): Usage, data= [ 0x21 0x02 ] 545
+                            AC Search
+            Item(Local ): Usage, data= [ 0x23 0x02 ] 547
+                            AC Home
+            Item(Local ): Usage, data= [ 0x24 0x02 ] 548
+                            AC Back
+            Item(Local ): Usage, data= [ 0x25 0x02 ] 549
+                            AC Forward
+            Item(Local ): Usage, data= [ 0x26 0x02 ] 550
+                            AC Stop
+            Item(Local ): Usage, data= [ 0x27 0x02 ] 551
+                            AC Refresh
+            Item(Local ): Usage, data= [ 0x2a 0x02 ] 554
+                            (null)
+            Item(Local ): Usage, data= [ 0xb1 0x02 ] 689
+                            (null)
+            Item(Global): Report Count, data= [ 0x08 ] 8
+            Item(Main  ): Input, data= [ 0x03 ] 3
+                            Constant Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Main  ): End Collection, data=none
+            Item(Global): Usage Page, data= [ 0x00 0xff ] 65280
+                            (null)
+            Item(Local ): Usage, data= [ 0x01 ] 1
+                            (null)
+            Item(Main  ): Collection, data= [ 0x01 ] 1
+                            Application
+            Item(Global): Report ID, data= [ 0x04 ] 4
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Logical Maximum, data= [ 0xff 0x00 ] 255
+            Item(Local ): Usage, data= [ 0x00 ] 0
+                            (null)
+            Item(Global): Report Size, data= [ 0x08 ] 8
+            Item(Global): Report Count, data= [ 0x07 0x02 ] 519
+            Item(Main  ): Feature, data= [ 0x02 ] 2
+                            Data Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Main  ): End Collection, data=none
+
+            ^^ 519 byte feature report, no usage, probably for settings
+
+            Item(Global): Usage Page, data= [ 0x00 0xff ] 65280
+                            (null)
+            Item(Local ): Usage, data= [ 0x01 ] 1
+                            (null)
+            Item(Main  ): Collection, data= [ 0x01 ] 1
+                            Application
+            Item(Global): Report ID, data= [ 0x07 ] 7
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Logical Maximum, data= [ 0xff 0x00 ] 255
+            Item(Local ): Usage, data= [ 0x00 ] 0
+                            (null)
+            Item(Global): Report Size, data= [ 0x08 ] 8
+            Item(Global): Report Count, data= [ 0x07 ] 7
+            Item(Main  ): Input, data= [ 0x00 ] 0
+                            Data Array Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Main  ): End Collection, data=none
+
+            ^^ Input report 0x7, no HID usage... proprietary stuff.
+
+            Item(Global): Usage Page, data= [ 0x00 0xff ] 65280
+                            (null)
+            Item(Local ): Usage, data= [ 0x01 ] 1
+                            (null)
+            Item(Main  ): Collection, data= [ 0x01 ] 1
+                            Application
+            Item(Global): Report ID, data= [ 0x05 ] 5
+            Item(Global): Logical Minimum, data= [ 0x00 ] 0
+            Item(Global): Logical Maximum, data= [ 0xff 0x00 ] 255
+            Item(Local ): Usage, data= [ 0x00 ] 0
+                            (null)
+            Item(Global): Report Count, data= [ 0x05 ] 5
+            Item(Global): Report Size, data= [ 0x08 ] 8
+            Item(Main  ): Feature, data= [ 0x02 ] 2
+                            Data Variable Absolute No_Wrap Linear
+                            Preferred_State No_Null_Position Non_Volatile Bitfield
+            Item(Main  ): End Collection, data=none
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0008  1x 8 bytes
+        bInterval               1
