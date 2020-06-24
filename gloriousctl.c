@@ -90,7 +90,7 @@ struct config {
     uint8_t unk2[6];
     uint8_t config1;
     /* 0x80 - XY DPI independent */
-    uint8_t unk3:4;
+    uint8_t dpi_count:4;
     uint8_t active_dpi:4;
     uint8_t dpi_enabled;
     /* bit set: disabled, unset: enabled
@@ -416,9 +416,11 @@ int main(int argc, char* argv[])
                 int num_dpis = sscanf(set_dpi, "%d,%d,%d,%d,%d,%d", &dpi[0], &dpi[1], &dpi[2],
                                       &dpi[3], &dpi[4], &dpi[5]);
                 cfg->dpi_enabled = 0xff;
+                cfg->dpi_count = 0;
                 for(int i = 0; i < num_dpis; i++) {
                     cfg->dpi[i] = dpi_to_config(dpi[i]);
                     cfg->dpi_enabled &= ~(1<<i);
+                    cfg->dpi_count++;
                 }
                 printf("%s %d\n", set_dpi, num_dpis);
             }
@@ -450,7 +452,7 @@ int main(int argc, char* argv[])
 }
 
 
-
+/* from https://stackoverflow.com/a/7776146/675646 */
 void hexDump (const char * desc, const void * addr, const int len) {
     int i;
     unsigned char buff[17];
