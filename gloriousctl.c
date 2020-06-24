@@ -270,6 +270,8 @@ int print_help()
             "\tShow this help text.\n"
             " gloriousctl --info\n"
             "\tShow the current configuration of the mouse.\n"
+            " gloriousctl --listen\n"
+            "\tListen for and show DPI profile changes.\n"
             " gloriousctl [--set-...]\n"
             "\tChange persistent mouse settings.\n"
             "\n"
