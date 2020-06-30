@@ -20,7 +20,15 @@ works for other Sinowealth-made mice as well.
      --set-dpi-color RRGGBB,...
             For each DPI the RGB color can be set.
      --set-effect effect-name
-            Available RGB effects: off, ...
+            Available RGB effects: off, glorious, breathing, wave, tail,
+            single, breathing7, breathing1, rave
+            single and breathing1 use one color, breathing7 seven, rave two.
+     --set-colors RRGGBB,...
+            Set the color(s) of the effect. Only effective with --set-effect.
+     --set-brightness 0-4
+            Set the brightness of the effect. Only effective with --set-effect.
+     --set-speed 0-3
+            Set the speed of the effect. Only effective with --set-effect.
 
     Supported mice:
      - Glorious Model D (VID 258a PID 0033)

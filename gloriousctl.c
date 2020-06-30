@@ -38,6 +38,10 @@ typedef struct {
     uint8_t r, g, b;
 } RGB8;
 
+typedef struct {
+    uint8_t r, b, g;
+} RBG8;
+
 enum rgb_effect {
     RGB_OFF = 0,
     RGB_GLORIOUS = 0x1,   /* unicorn mode */
@@ -58,19 +62,55 @@ const char *rgb_effect_to_name(enum rgb_effect rgb_effect)
     case RGB_GLORIOUS: return "Glorious mode";
     case RGB_SINGLE: return "Single color";
     case RGB_BREATHING: return "RGB breathing";
-    case RGB_BREATHING7: return "Multi-color breathing";
+    case RGB_BREATHING7: return "Seven-color breathing";
     case RGB_BREATHING1: return "Single color breathing";
     case RGB_TAIL: return "Tail effect";
-    case RGB_RAVE: return "Rave!11";
+    case RGB_RAVE: return "Two-color rave!11";
     case RGB_WAVE: return "Wave effect";
     }
     return "control reaches end of non-void function";
 }
 
 static
+enum rgb_effect name_to_rgb_effect(const char *name)
+{
+    if(!strcmp(name, "off")) {
+        return RGB_OFF;
+    } else if(!strcmp(name, "glorious")) {
+        return RGB_GLORIOUS;
+    } else if(!strcmp(name, "single")) {
+        return RGB_SINGLE;
+    } else if(!strcmp(name, "breathing")) {
+        return RGB_BREATHING;
+    } else if(!strcmp(name, "breathing7")) {
+        return RGB_BREATHING7;
+    } else if(!strcmp(name, "breathing1")) {
+        return RGB_BREATHING1;
+    } else if(!strcmp(name, "tail")) {
+        return RGB_TAIL;
+    } else if(!strcmp(name, "rave")) {
+        return RGB_RAVE;
+    } else if(!strcmp(name, "wave")) {
+        return RGB_WAVE;
+    } else {
+        return RGB_OFF;
+    }
+}
+
+static
 RGB8 int_to_rgb(unsigned int value)
 {
     RGB8 rgb;
+    rgb.r = value >> 16;
+    rgb.g = value >> 8;
+    rgb.b = value;
+    return rgb;
+}
+
+static
+RBG8 int_to_rbg(unsigned int value)
+{
+    RBG8 rgb;
     rgb.r = value >> 16;
     rgb.g = value >> 8;
     rgb.b = value;
@@ -114,37 +154,40 @@ struct config {
      */
     char glorious_direction;
 
-    RGB8 single_color;
+    uint8_t single_mode;
+    RBG8 single_color;
 
-    char breathing_mode;
+    char breathing7_mode;
     /* 0x40 - brightness (constant)
      * 0x1/2/3 - speed
      */
-    char breathing_colorcount;
+    char breathing7_colorcount;
     /* 7, constant */
-    RGB8 breathing_colors[7];
+    RBG8 breathing7_colors[7];
 
     char tail_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
 
+    uint8_t unk4[33];
+
     char rave_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
-    RGB8 rave_colors[2];
+    RBG8 rave_colors[2];
 
     char wave_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
 
-    char breathing1_mode;
+    uint8_t breathing1_mode;
     /* 0x1/2/3 - speed */
-    RGB8 breathing1_color;
+    RBG8 breathing1_color;
 
-    char unk4;
+    char unk5;
     char lift_off_distance;
     /* 0x1 - 2 mm
      * 0x2 - 3 mm
@@ -181,6 +224,27 @@ void print_color(RGB8 color)
     printf("#%02X%02X%02X", color.r, color.g, color.b);
     printf("\e[39m");
 }
+
+static
+void print_color_rbg(RBG8 color)
+{
+    printf("\e[38;2;%d;%d;%dm", color.r, color.g, color.b);
+    printf("#%02X%02X%02X", color.r, color.g, color.b);
+    printf("\e[39m");
+}
+
+static
+int clamp(int value, int lower, int upper)
+{
+    if(value < lower) {
+        return lower;
+    } else if(value > upper) {
+        return upper;
+    }
+    return value;
+}
+
+#include <stddef.h>
 
 static
 void dump_config(const struct config *cfg)
@@ -281,7 +345,15 @@ int print_help()
             " --set-dpi-color RRGGBB,...\n"
             "\tFor each DPI the RGB color can be set.\n"
             " --set-effect effect-name\n"
-            "\tAvailable RGB effects: off, ...\n" /* TODO (maybe) */
+            "\tAvailable RGB effects: off, glorious, breathing, wave, tail,\n"
+            "\tsingle, breathing7, breathing1, rave\n"
+            "\tsingle and breathing1 use one color, breathing7 seven, rave two.\n"
+            " --set-colors RRGGBB,...\n"
+            "\tSet the color(s) of the effect. Only effective with --set-effect.\n"
+            " --set-brightness 0-4\n"
+            "\tSet the brightness of the effect. Only effective with --set-effect.\n"
+            " --set-speed 0-3\n"
+            "\tSet the speed of the effect. Only effective with --set-effect.\n"
             "\n"
         );
 
@@ -307,6 +379,9 @@ int main(int argc, char* argv[])
     const char *set_dpi = 0;
     const char *set_dpi_color = 0;
     const char *set_effect = 0;
+    const char *set_effect_colors = "";
+    const char *set_effect_brightness = "4";
+    const char *set_effect_speed = "3";
 
     struct option options[] = {
         {"info", no_argument, &do_info, 1},
@@ -315,6 +390,9 @@ int main(int argc, char* argv[])
         {"set-dpi", required_argument, 0, 'a'},
         {"set-dpi-color", required_argument, 0, 'b'},
         {"set-effect", required_argument, 0, 'c'},
+        {"set-colors", required_argument, 0, 'd'},
+        {"set-brightness", required_argument, 0, 'e'},
+        {"set-speed", required_argument, 0, 'f'},
         {0}
     };
     while(1) {
@@ -336,6 +414,15 @@ int main(int argc, char* argv[])
             break;
         case 'c':
             set_effect = optarg;
+            break;
+        case 'd':
+            set_effect_colors = optarg;
+            break;
+        case 'e':
+            set_effect_brightness = optarg;
+            break;
+        case 'f':
+            set_effect_speed = optarg;
             break;
         }
     }
@@ -432,6 +519,60 @@ int main(int argc, char* argv[])
                                         &dpi_color[2], &dpi_color[3], &dpi_color[4], &dpi_color[5]);
                 for(int i = 0; i < num_colors; i++) {
                     cfg->dpi_color[i] = int_to_rgb(dpi_color[i]);
+                }
+            }
+            if(set_effect) {
+                cfg->rgb_effect = name_to_rgb_effect(set_effect);
+                unsigned int rgb_colors[7] = {0};
+                int num_colors = sscanf(set_effect_colors,  "%x,%x,%x,%x,%x,%x,%x", &rgb_colors[0],
+                                        &rgb_colors[1], &rgb_colors[2], &rgb_colors[3], &rgb_colors[4],
+                                        &rgb_colors[5], &rgb_colors[6]);
+                switch(cfg->rgb_effect) {
+                case RGB_SINGLE:
+                    cfg->single_color = int_to_rbg(rgb_colors[0]);
+                    break;
+                case RGB_BREATHING7:
+                    for(int i = 0; i < num_colors; i++) {
+                        cfg->breathing7_colors[i] = int_to_rbg(rgb_colors[i]);
+                    }
+                    break;
+                case RGB_BREATHING1:
+                    cfg->breathing1_color = int_to_rbg(rgb_colors[0]);
+                    break;
+                case RGB_RAVE:
+                    cfg->rave_colors[0] = int_to_rbg(rgb_colors[0]);
+                    cfg->rave_colors[0] = int_to_rbg(rgb_colors[1]);
+                }
+
+                int brightness = 4, speed = 3;
+                sscanf(set_effect_brightness, "%d", &brightness);
+                sscanf(set_effect_speed, "%d", &speed);
+                brightness = clamp(brightness, 0, 4);
+                speed = clamp(speed, 0, 3);
+                uint8_t mode = speed | (brightness << 4);
+
+                switch(cfg->rgb_effect) {
+                case RGB_GLORIOUS:
+                    cfg->glorious_mode = mode;
+                    break;
+                case RGB_SINGLE:
+                    cfg->single_mode = mode;
+                    break;
+                case RGB_BREATHING7:
+                    cfg->breathing7_mode = mode;
+                    break;
+                case RGB_BREATHING1:
+                    cfg->breathing1_mode = mode;
+                    break;
+                case RGB_TAIL:
+                    cfg->tail_mode = mode;
+                    break;
+                case RGB_RAVE:
+                    cfg->rave_mode = mode;
+                    break;
+                case RGB_WAVE:
+                    cfg->wave_mode = mode;
+                    break;
                 }
             }
 
