@@ -126,6 +126,7 @@ RBG8 int_to_rbg(unsigned int value)
 #define CMD_CONFIG 0x11
 #define CONFIG_SIZE 520
 #define CONFIG_SIZE_USED 131
+#define NUM_DPIS 6
 #define REPORT_ID_CMD 0x5
 #define REPORT_ID_CONFIG 0x4
 #define XY_INDEPENDENT 0x80
@@ -262,7 +263,7 @@ void dump_config(const struct config *cfg)
 {
     int xy_independent = (cfg->config1 & XY_INDEPENDENT) == XY_INDEPENDENT;
     printf("XY DPI independent: %s\n", xy_independent ? "yes" : "no");
-    for(unsigned int i = 0; i < 6; i++) {
+    for(unsigned int i = 0; i < NUM_DPIS; i++) {
         if(cfg->dpi_enabled & (1U<<i)) {
             printf("[ ] ");
         } else {
@@ -527,7 +528,7 @@ int main(int argc, char* argv[])
             }
         } else if(do_set) {
             if(set_dpi) {
-                int dpi[6] = {0};
+                int dpi[NUM_DPIS] = {0};
                 unsigned int num_dpis = sscanf(set_dpi, "%d,%d,%d,%d,%d,%d", &dpi[0], &dpi[1], &dpi[2],
                                       &dpi[3], &dpi[4], &dpi[5]);
                 cfg->dpi_enabled = 0xff;
@@ -540,7 +541,7 @@ int main(int argc, char* argv[])
                 printf("%s %d\n", set_dpi, num_dpis);
             }
             if(set_dpi_color) {
-                unsigned int dpi_color[6] = {0};
+                unsigned int dpi_color[NUM_DPIS] = {0};
                 unsigned int num_colors = sscanf(set_dpi_color, "%x,%x,%x,%x,%x,%x", &dpi_color[0], &dpi_color[1],
                                         &dpi_color[2], &dpi_color[3], &dpi_color[4], &dpi_color[5]);
                 for(unsigned int i = 0; i < num_colors; i++) {
