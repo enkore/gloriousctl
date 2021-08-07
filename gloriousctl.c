@@ -74,27 +74,32 @@ const char *rgb_effect_to_name(enum rgb_effect rgb_effect)
 static
 enum rgb_effect name_to_rgb_effect(const char *name)
 {
-    if(!strcmp(name, "off")) {
-        return RGB_OFF;
-    } else if(!strcmp(name, "glorious")) {
+    if(!strcmp(name, "glorious")) {
         return RGB_GLORIOUS;
-    } else if(!strcmp(name, "single")) {
-        return RGB_SINGLE;
-    } else if(!strcmp(name, "breathing")) {
-        return RGB_BREATHING;
-    } else if(!strcmp(name, "breathing7")) {
-        return RGB_BREATHING7;
-    } else if(!strcmp(name, "breathing1")) {
-        return RGB_BREATHING1;
-    } else if(!strcmp(name, "tail")) {
-        return RGB_TAIL;
-    } else if(!strcmp(name, "rave")) {
-        return RGB_RAVE;
-    } else if(!strcmp(name, "wave")) {
-        return RGB_WAVE;
-    } else {
-        return RGB_OFF;
     }
+    if(!strcmp(name, "single")) {
+        return RGB_SINGLE;
+    }
+    if(!strcmp(name, "breathing")) {
+        return RGB_BREATHING;
+    }
+    if(!strcmp(name, "breathing7")) {
+        return RGB_BREATHING7;
+    }
+    if(!strcmp(name, "breathing1")) {
+        return RGB_BREATHING1;
+    }
+    if(!strcmp(name, "tail")) {
+        return RGB_TAIL;
+    }
+    if(!strcmp(name, "rave")) {
+        return RGB_RAVE;
+    }
+    if(!strcmp(name, "wave")) {
+        return RGB_WAVE;
+    }
+
+    return RGB_OFF;
 }
 
 static
@@ -243,9 +248,11 @@ int clamp(int value, int lower, int upper)
 {
     if(value < lower) {
         return lower;
-    } else if(value > upper) {
+    }
+    if(value > upper) {
         return upper;
     }
+
     return value;
 }
 
@@ -434,7 +441,8 @@ int main(int argc, char* argv[])
 
     if(do_help) {
         return print_help();
-    } else if(do_info || do_set || do_listen) {
+    }
+    if(do_info || do_set || do_listen) {
         int res;
         char *dev_path = detect_device();
         hid_device *dev;
@@ -617,7 +625,7 @@ void hexDump (const char * desc, const void * addr, const int len) {
         printf("  ZERO LENGTH\n");
         return;
     }
-    else if (len < 0) {
+    if (len < 0) {
         printf("  NEGATIVE LENGTH: %d\n", len);
         return;
     }
