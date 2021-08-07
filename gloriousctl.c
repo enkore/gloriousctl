@@ -126,6 +126,7 @@ RBG8 int_to_rbg(unsigned int value)
 }
 
 #define CMD_CONFIG 0x11
+#define CMD_DEBOUNCE 0x1a
 #define CONFIG_SIZE 520
 #define CONFIG_SIZE_USED 131
 #define NUM_DPIS 6
@@ -327,6 +328,27 @@ void print_hid_error(hid_device *handle, const char *operation)
     fprintf(stderr, "%s: %s\n", operation, err);
 }
 
+// In milliseconds.
+static
+int get_debounce_time(hid_device *dev)
+{
+    int res = 0;
+
+    uint8_t debounce[6] = {REPORT_ID_CMD, CMD_DEBOUNCE};
+    res = hid_send_feature_report(dev, debounce, sizeof(debounce));
+    if(res != sizeof(debounce)) {
+        print_hid_error(dev, "get debounce time command");
+        return 1;
+    }
+    res = hid_get_feature_report(dev, debounce, sizeof(debounce));
+    if(res != sizeof(debounce)) {
+        print_hid_error(dev, "read debounce time");
+        return 1;
+    }
+
+    return debounce[2] * 2;
+}
+
 static
 int print_firmware_version(hid_device *dev)
 {
@@ -366,6 +388,8 @@ int print_help()
             "\tChange persistent mouse settings.\n"
             "\n"
             "Available settings:\n"
+            " --set-debounce-time 4-16\n"
+            "\tChange click debounce time in milliseconds. Only use even numbers.\n"
             " --set-dpi DPI1,...\n"
             "\tUp to six DPIs can be configured.\n"
             " --set-dpi-color RRGGBB,...\n"
@@ -402,6 +426,7 @@ int main(int argc, char* argv[])
     int do_set = 0;
     int do_listen = 0;
 
+    const char *set_debounce_time = 0;
     const char *set_dpi = 0;
     const char *set_dpi_color = 0;
     const char *set_effect = 0;
@@ -419,6 +444,7 @@ int main(int argc, char* argv[])
         {"set-colors", required_argument, 0, 'd'},
         {"set-brightness", required_argument, 0, 'e'},
         {"set-speed", required_argument, 0, 'f'},
+        {"set-debounce-time", required_argument, 0, 'g'},
         {0}
     };
     while(1) {
@@ -450,6 +476,8 @@ int main(int argc, char* argv[])
         case 'f':
             set_effect_speed = optarg;
             break;
+        case 'g':
+            set_debounce_time = optarg;
         default:;
         }
     }
@@ -521,6 +549,23 @@ int main(int argc, char* argv[])
                 hexDump("inpr", &report, sizeof(report));
             }
         } else if(do_set) {
+            if(set_debounce_time) {
+                printf("Old click debounce time: %u ms\n", get_debounce_time(dev));
+
+                unsigned int debounce_time = 0;
+                sscanf(set_debounce_time, "%u", &debounce_time);
+                if(debounce_time < 4 || debounce_time > 16) {
+                    printf("Trying to set an insane debounce time: %d ms\n", debounce_time);
+                    return 1;
+                }
+
+                uint8_t cmd[6] = {REPORT_ID_CMD, CMD_DEBOUNCE, debounce_time / 2};
+                res = hid_send_feature_report(dev, cmd, sizeof(cmd));
+                if(res != sizeof(cmd)) {
+                    print_hid_error(dev, "set debounce time");
+                    return 1;
+                }
+            }
             if(set_dpi) {
                 int dpi[NUM_DPIS] = {0};
                 unsigned int num_dpis = sscanf(set_dpi, "%d,%d,%d,%d,%d,%d", &dpi[0], &dpi[1], &dpi[2],
