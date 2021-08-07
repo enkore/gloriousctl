@@ -119,6 +119,7 @@ RBG8 int_to_rbg(unsigned int value)
 
 #define CMD_CONFIG 0x11
 #define CONFIG_SIZE 520
+#define CONFIG_SIZE_USED 131
 #define REPORT_ID_CMD 0x5
 #define REPORT_ID_CONFIG 0x4
 #define XY_INDEPENDENT 0x80
@@ -128,8 +129,8 @@ struct config {
     uint8_t command_id;
     uint8_t unk1;
     uint8_t config_write;
-    /* always 0 when config is read from device,
-     * has to be 0x7b when writing config to device
+    /* 0x0 - read.
+     * CONFIG_SIZE_USED-8 - write.
      */
     uint8_t unk2[6];
     uint8_t config1;
@@ -582,7 +583,7 @@ int main(int argc, char* argv[])
 
             dump_config(cfg);
 
-            cfg->config_write = 0x7b;
+            cfg->config_write = CONFIG_SIZE_USED - 8;
 
             res = hid_send_feature_report(dev, (uint8_t*)cfg, CONFIG_SIZE);
             if(res == -1) {
