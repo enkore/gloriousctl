@@ -443,9 +443,9 @@ int main(int argc, char* argv[])
         return print_help();
     }
     if(do_info || do_set || do_listen) {
-        int res;
+        int res = 0;
         char *dev_path = detect_device();
-        hid_device *dev;
+        hid_device *dev = NULL;
 
         if(!dev_path) {
             fprintf(stderr, "No supported device found.\n");
@@ -610,7 +610,7 @@ int main(int argc, char* argv[])
 
 /* from https://stackoverflow.com/a/7776146/675646 */
 void hexDump (const char * desc, const void * addr, const int len) {
-    int i;
+    int i = 0;
     unsigned char buff[17];
     const unsigned char * pc = (const unsigned char *)addr;
 
