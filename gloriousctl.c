@@ -30,6 +30,8 @@ struct supported_device {
  * is the same as the glorious software.
  */
 static struct supported_device supported_devices[] = {
+    // G-Wolves Hati has the same PID, but uses a different report ID for changing configuration (0x6).
+    { .vid = 0x258a, .pid = 0x27, .name =  "Dream Machines DM5" },
     { .vid = 0x258a, .pid = 0x33, .name =  "Glorious Model D" },
     { .vid = 0x258a, .pid = 0x36, .name =  "Glorious Model O/O-" }, // probably works
 };
