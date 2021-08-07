@@ -1,12 +1,13 @@
+#include <fcntl.h>
 #include <getopt.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <hidapi/hidapi.h>
-
 #include <sys/types.h>
-#include <fcntl.h>
+
+#include <hidapi/hidapi.h>
 
 #define MAX_STR 255
 
@@ -255,8 +256,6 @@ unsigned int clamp(unsigned int value, unsigned int lower, unsigned int upper)
 
     return value;
 }
-
-#include <stddef.h>
 
 static
 void dump_config(const struct config *cfg)
