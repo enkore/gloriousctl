@@ -117,6 +117,10 @@ RBG8 int_to_rbg(unsigned int value)
     return rgb;
 }
 
+#define CMD_CONFIG 0x11
+#define CONFIG_SIZE 520
+#define REPORT_ID_CMD 0x5
+#define REPORT_ID_CONFIG 0x4
 #define XY_INDEPENDENT 0x80
 
 struct config {
@@ -461,17 +465,17 @@ int main(int argc, char* argv[])
         }
         printf("Firmware version: %.4s\n", version + 2);
 
-        uint8_t cmd[6] = {0x5, 0x11};
+        uint8_t cmd[6] = {REPORT_ID_CMD, CMD_CONFIG};
         res = hid_send_feature_report(dev, cmd, sizeof(cmd));
         if(res != sizeof(cmd)) {
             print_hid_error(dev, "get config command");
             return 1;
         }
 
-        struct config *cfg = calloc(1, 520);
-        cfg->report_id = 0x4;
+        struct config *cfg = calloc(1, CONFIG_SIZE);
+        cfg->report_id = REPORT_ID_CONFIG;
         /* this isn't portable code anyway due to packed structs */
-        res = hid_get_feature_report(dev, (uint8_t*)cfg, 520);
+        res = hid_get_feature_report(dev, (uint8_t*)cfg, CONFIG_SIZE);
         if(res == -1) {
             print_hid_error(dev, "read config");
             return 1;
@@ -580,7 +584,7 @@ int main(int argc, char* argv[])
 
             cfg->config_write = 0x7b;
 
-            res = hid_send_feature_report(dev, (uint8_t*)cfg, 520);
+            res = hid_send_feature_report(dev, (uint8_t*)cfg, CONFIG_SIZE);
             if(res == -1) {
                 print_hid_error(dev, "write config");
                 return 1;
