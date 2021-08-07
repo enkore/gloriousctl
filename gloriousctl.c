@@ -67,8 +67,8 @@ const char *rgb_effect_to_name(enum rgb_effect rgb_effect)
     case RGB_TAIL: return "Tail effect";
     case RGB_RAVE: return "Two-color rave!11";
     case RGB_WAVE: return "Wave effect";
+    default: return "control reaches end of non-void function";
     }
-    return "control reaches end of non-void function";
 }
 
 static
@@ -436,6 +436,7 @@ int main(int argc, char* argv[])
         case 'f':
             set_effect_speed = optarg;
             break;
+        default:;
         }
     }
 
