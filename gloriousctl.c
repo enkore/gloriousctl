@@ -238,14 +238,6 @@ void print_color(RGB8 color)
 }
 
 static
-void print_color_rbg(RBG8 color)
-{
-    printf("\e[38;2;%d;%d;%dm", color.r, color.g, color.b);
-    printf("#%02X%02X%02X", color.r, color.g, color.b);
-    printf("\e[39m");
-}
-
-static
 unsigned int clamp(unsigned int value, unsigned int lower, unsigned int upper)
 {
     if(value < lower) {
