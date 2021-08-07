@@ -486,11 +486,13 @@ int main(int argc, char* argv[])
             return res;
         }
 
-        uint8_t cmd[6] = {REPORT_ID_CMD, CMD_CONFIG};
-        res = hid_send_feature_report(dev, cmd, sizeof(cmd));
-        if(res != sizeof(cmd)) {
-            print_hid_error(dev, "get config command");
-            return 1;
+        {
+            uint8_t cmd[6] = {REPORT_ID_CMD, CMD_CONFIG};
+            res = hid_send_feature_report(dev, cmd, sizeof(cmd));
+            if(res != sizeof(cmd)) {
+                print_hid_error(dev, "get config command");
+                return 1;
+            }
         }
 
         struct config *cfg = calloc(1, CONFIG_SIZE);
