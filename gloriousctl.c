@@ -106,8 +106,8 @@ static
 RGB8 int_to_rgb(unsigned int value)
 {
     RGB8 rgb;
-    rgb.r = value >> 16;
-    rgb.g = value >> 8;
+    rgb.r = value >> 16U;
+    rgb.g = value >> 8U;
     rgb.b = value;
     return rgb;
 }
@@ -116,8 +116,8 @@ static
 RBG8 int_to_rbg(unsigned int value)
 {
     RBG8 rgb;
-    rgb.r = value >> 16;
-    rgb.g = value >> 8;
+    rgb.r = value >> 16U;
+    rgb.g = value >> 8U;
     rgb.b = value;
     return rgb;
 }
@@ -155,40 +155,40 @@ struct config {
      */
     RGB8 dpi_color[8];
 
-    char rgb_effect;
+    uint8_t rgb_effect;
     /* see enum rgb_effect */
 
-    char glorious_mode;
+    uint8_t glorious_mode;
     /* 0x40 - brightness (constant)
      * 0x1/2/3 - speed
      */
-    char glorious_direction;
+    uint8_t glorious_direction;
 
     uint8_t single_mode;
     RBG8 single_color;
 
-    char breathing7_mode;
+    uint8_t breathing7_mode;
     /* 0x40 - brightness (constant)
      * 0x1/2/3 - speed
      */
-    char breathing7_colorcount;
+    uint8_t breathing7_colorcount;
     /* 7, constant */
     RBG8 breathing7_colors[7];
 
-    char tail_mode;
+    uint8_t tail_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
 
     uint8_t unk4[33];
 
-    char rave_mode;
+    uint8_t rave_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
     RBG8 rave_colors[2];
 
-    char wave_mode;
+    uint8_t wave_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
@@ -197,11 +197,11 @@ struct config {
     /* 0x1/2/3 - speed */
     RBG8 breathing1_color;
 
-    char unk5;
-    char lift_off_distance;
+    uint8_t unk5;
     /* 0x1 - 2 mm
      * 0x2 - 3 mm
      */
+    uint8_t lift_off_distance;
 };
 
 struct change_report {
@@ -244,7 +244,7 @@ void print_color_rbg(RBG8 color)
 }
 
 static
-int clamp(int value, int lower, int upper)
+unsigned int clamp(unsigned int value, unsigned int lower, unsigned int upper)
 {
     if(value < lower) {
         return lower;
@@ -263,8 +263,8 @@ void dump_config(const struct config *cfg)
 {
     int xy_independent = (cfg->config1 & XY_INDEPENDENT) == XY_INDEPENDENT;
     printf("XY DPI independent: %s\n", xy_independent ? "yes" : "no");
-    for(int i = 0; i < 6; i++) {
-        if(cfg->dpi_enabled & (1<<i)) {
+    for(unsigned int i = 0; i < 6; i++) {
+        if(cfg->dpi_enabled & (1U<<i)) {
             printf("[ ] ");
         } else {
             if(cfg->active_dpi == i) {
@@ -310,7 +310,7 @@ char *detect_device()
     hid_init();
 
     char *path = NULL;
-    for(unsigned i = 0; i < sizeof(supported_devices)/sizeof(supported_devices[0]); i++) {
+    for(unsigned int i = 0; i < sizeof(supported_devices)/sizeof(supported_devices[0]); i++) {
         path = find_device(&supported_devices[i]);
         if(path) {
             fprintf(stderr, "Detected %s\n", supported_devices[i].name);
@@ -370,7 +370,7 @@ int print_help()
         );
 
     fprintf(stderr, "Supported mice:\n");
-    for(unsigned i = 0; i < sizeof(supported_devices)/sizeof(supported_devices[0]); i++) {
+    for(unsigned int i = 0; i < sizeof(supported_devices)/sizeof(supported_devices[0]); i++) {
         struct supported_device dev = supported_devices[i];
         fprintf(stderr, " - %s (VID %04x PID %04x)\n", dev.name, dev.vid, dev.pid);
     }
@@ -512,32 +512,31 @@ int main(int argc, char* argv[])
                 hexDump("inpr", &report, sizeof(report));
             }
         } else if(do_set) {
-
             if(set_dpi) {
                 int dpi[6] = {0};
-                int num_dpis = sscanf(set_dpi, "%d,%d,%d,%d,%d,%d", &dpi[0], &dpi[1], &dpi[2],
+                unsigned int num_dpis = sscanf(set_dpi, "%d,%d,%d,%d,%d,%d", &dpi[0], &dpi[1], &dpi[2],
                                       &dpi[3], &dpi[4], &dpi[5]);
                 cfg->dpi_enabled = 0xff;
                 cfg->dpi_count = 0;
-                for(int i = 0; i < num_dpis; i++) {
+                for(unsigned int i = 0; i < num_dpis; i++) {
                     cfg->dpi[i] = dpi_to_config(dpi[i]);
-                    cfg->dpi_enabled &= ~(1<<i);
+                    cfg->dpi_enabled &= ~(1U<<i);
                     cfg->dpi_count++;
                 }
                 printf("%s %d\n", set_dpi, num_dpis);
             }
             if(set_dpi_color) {
                 unsigned int dpi_color[6] = {0};
-                int num_colors = sscanf(set_dpi_color, "%x,%x,%x,%x,%x,%x", &dpi_color[0], &dpi_color[1],
+                unsigned int num_colors = sscanf(set_dpi_color, "%x,%x,%x,%x,%x,%x", &dpi_color[0], &dpi_color[1],
                                         &dpi_color[2], &dpi_color[3], &dpi_color[4], &dpi_color[5]);
-                for(int i = 0; i < num_colors; i++) {
+                for(unsigned int i = 0; i < num_colors; i++) {
                     cfg->dpi_color[i] = int_to_rgb(dpi_color[i]);
                 }
             }
             if(set_effect) {
                 cfg->rgb_effect = name_to_rgb_effect(set_effect);
                 unsigned int rgb_colors[7] = {0};
-                int num_colors = sscanf(set_effect_colors,  "%x,%x,%x,%x,%x,%x,%x", &rgb_colors[0],
+                unsigned int num_colors = sscanf(set_effect_colors,  "%x,%x,%x,%x,%x,%x,%x", &rgb_colors[0],
                                         &rgb_colors[1], &rgb_colors[2], &rgb_colors[3], &rgb_colors[4],
                                         &rgb_colors[5], &rgb_colors[6]);
                 switch(cfg->rgb_effect) {
@@ -545,7 +544,7 @@ int main(int argc, char* argv[])
                     cfg->single_color = int_to_rbg(rgb_colors[0]);
                     break;
                 case RGB_BREATHING7:
-                    for(int i = 0; i < num_colors; i++) {
+                    for(unsigned int i = 0; i < num_colors; i++) {
                         cfg->breathing7_colors[i] = int_to_rbg(rgb_colors[i]);
                     }
                     break;
@@ -557,12 +556,13 @@ int main(int argc, char* argv[])
                     cfg->rave_colors[0] = int_to_rbg(rgb_colors[1]);
                 }
 
-                int brightness = 4, speed = 3;
+                unsigned int brightness = 4;
+                unsigned int speed = 3;
                 sscanf(set_effect_brightness, "%d", &brightness);
                 sscanf(set_effect_speed, "%d", &speed);
                 brightness = clamp(brightness, 0, 4);
                 speed = clamp(speed, 0, 3);
-                uint8_t mode = speed | (brightness << 4);
+                uint8_t mode = speed | (brightness << 4U);
 
                 switch(cfg->rgb_effect) {
                 case RGB_GLORIOUS:
