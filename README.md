@@ -15,6 +15,8 @@ works for other Sinowealth-made mice as well.
             Change persistent mouse settings.
 
     Available settings:
+     --set-debounce-time 4-16
+            Change click debounce time in milliseconds. Only use even numbers.
      --set-dpi DPI1,...
             Up to six DPIs can be configured.
      --set-dpi-color RRGGBB,...
