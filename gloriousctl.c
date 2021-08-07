@@ -134,68 +134,68 @@ struct config {
     uint8_t report_id;
     uint8_t command_id;
     uint8_t unk1;
-    uint8_t config_write;
     /* 0x0 - read.
      * CONFIG_SIZE_USED-8 - write.
      */
+    uint8_t config_write;
     uint8_t unk2[6];
-    uint8_t config1;
     /* 0x80 - XY DPI independent */
+    uint8_t config1;
     uint8_t dpi_count:4;
     uint8_t active_dpi:4;
-    uint8_t dpi_enabled;
     /* bit set: disabled, unset: enabled
      * this structure has support for eight DPI slots,
      * but the glorious software only exposes six
      */
-    uint8_t dpi[16];
+    uint8_t dpi_enabled;
     /* DPI/CPI is encoded in the way the PMW3360 sensor accepts it
      * value = (DPI - 100) / 100
      * If XY are identical, dpi[0-6] contain the sensitivities,
      * while in XY independent mode each entry takes two chars for X and Y.
      */
+    uint8_t dpi[16];
     RGB8 dpi_color[8];
 
-    uint8_t rgb_effect;
     /* see enum rgb_effect */
+    uint8_t rgb_effect;
 
-    uint8_t glorious_mode;
     /* 0x40 - brightness (constant)
      * 0x1/2/3 - speed
      */
+    uint8_t glorious_mode;
     uint8_t glorious_direction;
 
     uint8_t single_mode;
     RBG8 single_color;
 
-    uint8_t breathing7_mode;
     /* 0x40 - brightness (constant)
      * 0x1/2/3 - speed
      */
-    uint8_t breathing7_colorcount;
+    uint8_t breathing7_mode;
     /* 7, constant */
+    uint8_t breathing7_colorcount;
     RBG8 breathing7_colors[7];
 
-    uint8_t tail_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
+    uint8_t tail_mode;
 
     uint8_t unk4[33];
 
-    uint8_t rave_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
+    uint8_t rave_mode;
     RBG8 rave_colors[2];
 
-    uint8_t wave_mode;
     /* 0x10/20/30/40 - brightness
      * 0x1/2/3 - speed
      */
+    uint8_t wave_mode;
 
-    uint8_t breathing1_mode;
     /* 0x1/2/3 - speed */
+    uint8_t breathing1_mode;
     RBG8 breathing1_color;
 
     uint8_t unk5;
