@@ -333,6 +333,26 @@ void print_hid_error(hid_device *handle, const char *operation)
 }
 
 static
+int print_firmware_version(hid_device *dev)
+{
+    int res = 0;
+    uint8_t version[6] = {0x5, 0x1};
+    res = hid_send_feature_report(dev, version, sizeof(version));
+    if(res != sizeof(version)) {
+        print_hid_error(dev, "get firmware version command");
+        return 1;
+    }
+    res = hid_get_feature_report(dev, version, sizeof(version));
+    if(res != sizeof(version)) {
+        print_hid_error(dev, "read firmware version");
+        return 1;
+    }
+    printf("Firmware version: %.4s\n", version + 2);
+
+    return 0;
+}
+
+static
 int print_help()
 {
     fprintf(stderr,
@@ -461,18 +481,10 @@ int main(int argc, char* argv[])
 
         printf("%lu\n", sizeof(struct config));
 
-        uint8_t version[6] = {0x5, 0x1};
-        res = hid_send_feature_report(dev, version, sizeof(version));
-        if(res != sizeof(version)) {
-            print_hid_error(dev, "get firmware version command");
-            return 1;
+        res = print_firmware_version(dev);
+        if (res) {
+            return res;
         }
-        res = hid_get_feature_report(dev, version, sizeof(version));
-        if(res != sizeof(version)) {
-            print_hid_error(dev, "read firmware version");
-            return 1;
-        }
-        printf("Firmware version: %.4s\n", version + 2);
 
         uint8_t cmd[6] = {REPORT_ID_CMD, CMD_CONFIG};
         res = hid_send_feature_report(dev, cmd, sizeof(cmd));
