@@ -4,8 +4,8 @@ gloriousctl
 A utility to adjust the settings of Model O/D mice on Linux/BSD, but it probably
 works for other Sinowealth-made mice as well.
 
-[libratbag](https://github.com/libratbag) has a driver, which also supports macros
-and a GUI for configuration, based on further development of this code.
+[libratbag](https://github.com/libratbag), which also supports macros and a GUI
+for configuration, has a driver based on further development of this code.
 
     Usage:
      gloriousctl --help
