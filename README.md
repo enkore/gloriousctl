@@ -50,9 +50,9 @@ Caveats
 -------
 
 Possibly works with minor alterations with the wealth of sinowealth mice,
-since they allseem to use the exact same Windows utility to 
-configure them (except aconfig file telling it which VID/PID 
-to look for and what optionsexist).
+since they all seem to use the exact same Windows utility to 
+configure them (except a config file telling it which VID/PID 
+to look for and what options exist).
 
 Since this is not the official OEM/ODM (sinowealth would be an
 interesting case study...) software, and this appears to modify the
