@@ -146,6 +146,7 @@ struct config {
     /* 0x80 - XY DPI independent */
     uint8_t config1;
     uint8_t dpi_count:4;
+    /* Starting from 1 counting only active slots. */
     uint8_t active_dpi:4;
     /* bit set: disabled, unset: enabled
      * this structure has support for eight DPI slots,
@@ -258,15 +259,18 @@ void dump_config(const struct config *cfg)
 {
     int xy_independent = (cfg->config1 & XY_INDEPENDENT) == XY_INDEPENDENT;
     printf("XY DPI independent: %s\n", xy_independent ? "yes" : "no");
+    unsigned int active_dpi_index = 0;
     for(unsigned int i = 0; i < NUM_DPIS; i++) {
         if(cfg->dpi_enabled & (1U<<i)) {
             printf("[ ] ");
         } else {
-            if(cfg->active_dpi == i) {
+            if(cfg->active_dpi - 1U == active_dpi_index) {
                 printf("\e[1m[x]\e[0m ");
             } else {
                 printf("[x] ");
             }
+
+            ++active_dpi_index;
         }
         printf("DPI setting %d: ", i+1);
         if(xy_independent) {
