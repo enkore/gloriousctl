@@ -57,6 +57,13 @@ enum rgb_effect {
     RGB_WAVE = 0x9
 };
 
+// Battery status structure for wireless variants
+struct battery_info {
+    uint8_t level;        // 0-100%
+    uint8_t charging;     // 0 = not charging, 1 = charging
+    uint16_t voltage_mv;  // voltage in millivolts
+};
+
 static
 const char *rgb_effect_to_name(enum rgb_effect rgb_effect)
 {
@@ -127,6 +134,7 @@ RBG8 int_to_rbg(unsigned int value)
 
 #define CMD_CONFIG 0x11
 #define CMD_DEBOUNCE 0x1a
+#define CMD_BATTERY 0x1d    // command ID for battery status, model o wireless v1
 #define CONFIG_SIZE 520
 #define CONFIG_SIZE_USED 131
 #define NUM_DPIS 6
@@ -251,6 +259,57 @@ unsigned int clamp(unsigned int value, unsigned int lower, unsigned int upper)
     }
 
     return value;
+}
+
+// Get battery status for wireless variants
+static
+int get_battery_status(hid_device *dev, struct battery_info *info)
+{
+    int res = 0;
+    
+    // Initialize battery info to defaults
+    info->level = 0;
+    info->charging = 0;
+    info->voltage_mv = 0;
+    
+    // Send battery status command
+    // Note: The exact command structure may vary by device model
+    // This is based on common patterns in sinowealth devices
+    uint8_t battery_cmd[6] = {REPORT_ID_CMD, CMD_BATTERY, 0, 0, 0, 0};
+    res = hid_send_feature_report(dev, battery_cmd, sizeof(battery_cmd));
+    if(res != sizeof(battery_cmd)) {
+        // Silently fail - device might not support battery status (wired variant)
+        return -1;
+    }
+    
+    // Read battery status response
+    uint8_t battery_resp[8] = {0};
+    battery_resp[0] = REPORT_ID_CMD;
+    res = hid_get_feature_report(dev, battery_resp, sizeof(battery_resp));
+    if(res < 4) {
+        // Not enough data for battery status
+        return -1;
+    }
+    
+    // Parse battery status
+    // Byte 2: Battery level (0-100)
+    // Byte 3: Status flags (bit 0 = charging)
+    // Bytes 4-5: Voltage in mV (little endian)
+    if(battery_resp[1] == CMD_BATTERY) {
+        info->level = battery_resp[2];
+        info->charging = battery_resp[3] & 0x01;
+        info->voltage_mv = battery_resp[4] | (battery_resp[5] << 8);
+        
+        // Validate the data
+        if(info->level > 100) {
+            // Invalid battery level
+            return -1;
+        }
+        
+        return 0;
+    }
+    
+    return -1;
 }
 
 static
@@ -382,6 +441,7 @@ int print_help()
             "\tShow this help text.\n"
             " gloriousctl --info\n"
             "\tShow the current configuration of the mouse.\n"
+            "\tFor wireless variants, also shows battery status.\n"
             " gloriousctl --listen\n"
             "\tListen for and show DPI profile changes.\n"
             " gloriousctl [--set-...]\n"
@@ -532,6 +592,41 @@ int main(int argc, char* argv[])
 
         if(do_info) {
             dump_config(cfg);
+            
+            // Try to get battery status for wireless variants
+            struct battery_info battery;
+            if(get_battery_status(dev, &battery) == 0) {
+                printf("\nBattery Status:\n");
+                printf("  Level: %d%%\n", battery.level);
+                printf("  Status: %s\n", battery.charging ? "Charging" : "Discharging");
+                if(battery.voltage_mv > 0) {
+                    printf("  Voltage: %.2f V\n", battery.voltage_mv / 1000.0);
+                }
+                
+                // Add battery level indicator
+                printf("  [");
+                int bars = (battery.level + 9) / 10; // Round up to nearest 10%
+                for(int i = 0; i < 10; i++) {
+                    if(i < bars) {
+                        printf("█");
+                    } else {
+                        printf(" ");
+                    }
+                }
+                printf("] ");
+                
+                // Color code the percentage based on level
+                if(battery.level <= 20) {
+                    printf("\e[31m"); // Red for low battery
+                } else if(battery.level <= 50) {
+                    printf("\e[33m"); // Yellow for medium
+                } else {
+                    printf("\e[32m"); // Green for good
+                }
+                printf("%d%%\e[0m\n", battery.level);
+            }
+            // No error message if battery status fails - device might be wired
+
         } else if(do_listen) {
             /* obviously this is kinda pointless in a CLI tool;
              * consider it sample code if someone wants to write some kind of
